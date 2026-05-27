@@ -2,8 +2,8 @@
 
 This is my first Github 
 
-## What i learned 
+## What I Learned 
 - Git install and setup
-- git add, commit, push
-- github repository creation
-- basic wrokflow understanding
+- Git add, commit, push
+- Github repository creation
+- Basic wrokflow understanding
