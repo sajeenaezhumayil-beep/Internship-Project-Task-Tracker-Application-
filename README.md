@@ -1,4 +1,4 @@
-# day 1 Git Project
+# Day 1 Git Project
 
 This is my first Github 
 
