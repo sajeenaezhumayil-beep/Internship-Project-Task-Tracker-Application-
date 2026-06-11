@@ -24,7 +24,19 @@ const [aiMessage,setAiMessage]=useState("");
 const [notification,setNotification]=useState("");
 const [darkMode, setDarkMode] = useState(true);
 const [aiReason,setAiReason]=useState("");   // ✅ ADDED
+const hour = new Date().toLocaleString("en-US", {
+  timeZone: "Asia/Kolkata",
+  hour: "numeric",
+  hour12: false
+});
 
+const currentHour = Number(hour);
+const greeting =
+currentHour < 12
+? "☀️ Good Morning"
+: currentHour < 18
+? "🌤 Good Afternoon"
+: "🌙 Good Evening";
 useEffect(()=>{
 
 loadTasks();
@@ -159,7 +171,8 @@ loadTasks();
 
 // ---------------- FILTER ----------------
 const filteredTasks=
-tasks.filter(task=>{
+tasks
+.filter(task=>{
 
 const matchesSearch=
 task.title.toLowerCase().includes(search.toLowerCase());
@@ -168,6 +181,17 @@ const matchesStatus=
 statusFilter==="all" || task.status===statusFilter;
 
 return matchesSearch && matchesStatus;
+
+})
+.sort((a,b)=>{
+
+const order={
+high:3,
+medium:2,
+low:1
+};
+
+return order[b.priority]-order[a.priority];
 
 });
 
@@ -187,22 +211,38 @@ return(
 minHeight:"100vh",
 padding:"40px",
 background: darkMode
-? "linear-gradient(135deg,#0f172a,#1e3a8a)"
-: "linear-gradient(135deg,#f8fafc,#cbd5e1)",
+? "linear-gradient(135deg,#0f172a,#172554)"
+: "linear-gradient(135deg,#f8fafc,#e2e8f0)",
 fontFamily:"Segoe UI"
 }}>
-
+<p style={{
+textAlign:"center",
+color:"#38bdf8",
+fontWeight:"600",
+marginBottom:"10px"
+}}>
+{greeting}
+</p>
 <h1 style={{
 textAlign:"center",
-fontSize:"38px",
+fontSize:"30px",
 fontWeight:"700",
 letterSpacing:"0.5px",
-color:"white",
-marginBottom:"25px"
+color: darkMode ? "white" : "#0f172a",
+marginBottom:"20px"
 }}>
-🚀 AI Task Management Dashboard
+🚀 AI Task Manager
 </h1>
-
+<p
+style={{
+textAlign:"center",
+color: darkMode ? "#cbd5e1" : "#475569",
+marginTop:"-10px",
+marginBottom:"30px"
+}}
+>
+Smart task planning powered by AI
+</p>
 <div style={{
 display:"flex",
 justifyContent:"center",
@@ -220,7 +260,7 @@ fontSize:"16px",
 fontWeight:"600",
 background:"rgba(255,255,255,0.15)",
 backdropFilter:"blur(10px)",
-color:"white",
+color: darkMode ? "white" : "#0f172a",
 boxShadow:"0 4px 15px rgba(0,0,0,0.3)"
 }}
 >
@@ -242,11 +282,20 @@ flexWrap:"wrap"
 <StatCard title="High Priority" value={highPriority}/>
 </div>
 
+  <p style={{
+textAlign:"center",
+fontSize:"20px",
+fontWeight:"bold",
+color:"#facc15",
+marginBottom:"20px"
+}}>
+📊 {tasks.length ? Math.round((completed/tasks.length)*100) : 0}% Completed
+</p>
 {/* SEARCH */}
 <div style={{
 display:"flex",
 justifyContent:"center",
-gap:"10px",
+gap:"15px",
 flexWrap:"wrap",
 marginBottom:"20px"
 }}>
@@ -272,7 +321,7 @@ style={inputStyle}
 <div style={{
 display:"flex",
 justifyContent:"center",
-gap:"10px",
+gap:"15px",
 flexWrap:"wrap",
 marginBottom:"40px"
 }}>
@@ -316,7 +365,7 @@ background:
 "linear-gradient(135deg,#0f172a,#1e3a8a)",
 border:"none",
 borderRadius:"14px",
-color:"white",
+color: darkMode ? "#cbd5e1" : "#475569",
 fontWeight:"600",
 cursor:"pointer",
 boxShadow:"0 4px 15px rgba(124,58,237,0.4)"
@@ -332,7 +381,7 @@ padding:"15px 25px",
 background:"linear-gradient(45deg,#06b6d4,#10b981)",
 border:"none",
 borderRadius:"12px",
-color:"white",
+color: darkMode ? "#cbd5e1" : "#475569",
 fontWeight:"bold",
 cursor:"pointer"
 }}
@@ -346,8 +395,8 @@ cursor:"pointer"
 <div
 style={{
 background:"#10b981",
-color:"white",
-padding:"12px",
+color:"#cbd5e1",
+padding:"12px",color: darkMode ? "#cbd5e1" : "#475569",
 borderRadius:"12px",
 textAlign:"center",
 marginBottom:"20px",
@@ -368,7 +417,7 @@ margin:"0 auto 20px auto"
     color:"#f8fafc",
     textAlign:"center",
     marginBottom:"10px",
-    fontSize:"20px",
+    fontSize:"18px",
     fontWeight:"bold",
     background:"rgba(255,255,255,0.12)",
     padding:"12px",
@@ -400,6 +449,15 @@ gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",
 gap:"25px"
 }}>
 
+{filteredTasks.length === 0 && (
+<p style={{
+textAlign:"center",
+fontSize:"12px",
+color: darkMode ? "#cbd5e1" : "#475569"
+}}>
+📭 No tasks found
+</p>
+)}
 {filteredTasks.map(task => {
 
 const overdue =
@@ -418,15 +476,28 @@ return (
 
 <div
 key={task.id}
+
+onMouseEnter={(e)=>{
+e.currentTarget.style.transform="translateY(-5px)";
+}}
+
+onMouseLeave={(e)=>{
+e.currentTarget.style.transform="translateY(0px)";
+}}
+
+
 style={{
-background:"rgba(255,255,255,.12)",
+background:"rgba(255,255,255,0.08)",
 backdropFilter:"blur(20px)",
-padding:"30px",
-borderRadius:"25px",
-color:"white",
+padding:"18px",
+borderRadius:"18px",
+color: darkMode ? "#cbd5e1" : "#475569",
+textAlign:"center",
 boxShadow:"0 8px 30px rgba(0,0,0,.35)",
-border:`3px solid ${borderColor}`,
-transition:"0.3s"
+border:"1px solid rgba(255,255,255,.1)",
+transition:"0.3s",
+cursor:"pointer",
+transform:"translateY(0px)",
 }}
 >
 
@@ -446,7 +517,7 @@ padding:"10px 20px",
 border:"none",
 borderRadius:"10px",
 background:"#10b981",
-color:"white",
+color: darkMode ? "#cbd5e1" : "#475569",
 cursor:"pointer",
 marginTop:"10px"
 }}
@@ -461,22 +532,39 @@ Save
 
 <h2
 style={{
-fontSize:"28px",
-marginBottom:"15px"
+fontSize:"24px",
+fontWeight:"700",
+color: darkMode ? "#ffffff" : "#0f172a",
+marginBottom:"25px",
+textAlign:"center",
+letterSpacing:"0.5px"
 }}
 >
 {task.title}
 </h2>
-
-<p style={{marginBottom:"10px"}}>
-📌 Status:
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"10px",
+marginBottom:"12px"
+}}
+>
+<span> Status</span>
 <Badge value={task.status}/>
-</p>
+</div>
 
-<p style={{marginBottom:"10px"}}>
-🔥 Priority:
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"10px",
+marginBottom:"12px"
+}}
+>
+<span>Priority</span>
 <Badge value={task.priority}/>
-</p>
+</div>
 
 {task.due_date && (
 <p
@@ -485,8 +573,18 @@ marginBottom:"10px",
 fontWeight:"bold"
 }}
 >
-📅 Due:
-{task.due_date}
+<span
+style={{
+background:"rgba(59,130,246,.15)",
+padding:"4px 12px",
+fontSize:"14px",
+fontWeight:"600",
+borderRadius:"20px",
+border:"1px solid rgba(59,130,246,.3)"
+}}
+>
+📅 {task.due_date}
+</span>
 </p>
 )}
 
@@ -504,45 +602,50 @@ marginBottom:"10px"
 
 <p
 style={{
-opacity:"0.9",
+color: darkMode ? "#e2e8f0" : "#475569",
 fontStyle:"italic",
-marginBottom:"15px"
+marginBottom:"15px",
+textAlign:"left"
 }}
 >
-📝 {task.description || "No Description"}
+{task.description || "No Description"}
 </p>
-
 <div style={{
 display:"flex",
-gap:"10px"
+justifyContent:"center",
+gap:"12px",
+marginTop:"20px"
 }}>
 
 <button
 onClick={()=>startEdit(task)}
 style={{
-padding:"10px 15px",
+padding:"8px 18px",
 border:"none",
-borderRadius:"10px",
-background:"#3b82f6",
-color:"white",
+borderRadius:"8px",
+fontWeight:"600",
+background:"linear-gradient(45deg,#2563eb,#60a5fa)",
+color: darkMode ? "#cbd5e1" : "#475569",
 cursor:"pointer"
 }}
 >
-✏️ Edit
+ Edit
 </button>
 
 <button
 onClick={()=>deleteTask(task.id)}
 style={{
-padding:"10px 15px",
+padding:"10px 22px",
+fontSize:"15px",
 border:"none",
-borderRadius:"10px",
-background:"#ef4444",
-color:"white",
+borderRadius:"8px",
+fontWeight:"600",
+background:"linear-gradient(45deg,#dc2626,#f87171)",
+color: darkMode ? "#cbd5e1" : "#475569",
 cursor:"pointer"
 }}
 >
-🗑 Delete
+ Delete
 </button>
 
 </div>
@@ -593,33 +696,42 @@ marginLeft:"10px"
 function StatCard({title,value}){
 
 return(
-<div style={{
-background:"rgba(255,255,255,.15)",
-backdropFilter:"blur(15px)",
-padding:"25px",
-borderRadius:"20px",
-width:"180px",
-minHeight:"120px",
-display:"flex",
-flexDirection:"column",
-justifyContent:"center",
+
+<div
+style={{
+background:"rgba(255,255,255,.08)",
+backdropFilter:"blur(10px)",
+padding:"20px",
+borderRadius:"18px",
+width:"140px",
 textAlign:"center",
-color:"white",
-boxShadow:"0 6px 20px rgba(0,0,0,.25)"
-}}>
-<h3 style={{
-fontSize:"36px",
-margin:"0"
-}}>
+border:"1px solid rgba(255,255,255,.1)"
+}}
+>
+
+<h2
+style={{
+fontSize:"22px",
+marginBottom:"20px",
+color:"#cbd5e1",
+fontWeight:"600",
+textAlign:"center"
+}}
+>
 {value}
-</h3>
-<p style={{
-opacity:"0.85",
-marginTop:"10px"
-}}>
+</h2>
+
+<p
+style={{
+marginTop:"10px",
+color:"rgba(255,255,255,.85)"
+}}
+>
 {title}
 </p>
+
 </div>
+
 );
 
 }
