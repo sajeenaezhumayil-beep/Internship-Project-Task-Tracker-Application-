@@ -1,7 +1,6 @@
 //Railway build fix
-import axios from "axios";
-
-const BASE_URL = "https://my-backend.up.railway.app";
+import axios from "axios"
+const BASE_URL = "https://miraculous-integrity-production.up.railway.app/tasks";
 
 export const getTasks = async () => {
 

@@ -1,0 +1,77 @@
+from fastapi import FastAPI
+import models
+from models import Task
+from database import SessionLocal
+
+app = FastAPI()
+
+tasks = [
+    {
+        "id": 1,
+        "title": "Complete Internship Report",
+        "status": "pending",
+        "priority": "high"
+    },
+    {
+        "id": 2,
+        "title": "Learn FastAPI",
+        "status": "completed",
+        "priority": "medium"
+    },
+    {
+    "id": 3,
+    "title": "Learn Django",
+    "status": "todo",
+    "priority": "low"
+  }
+]
+
+@app.get("/tasks")
+def get_tasks():
+
+    db = SessionLocal()
+
+    all_tasks = db.query(Task).all()
+
+    return all_tasks
+@app.post("/tasks")
+def add_task(title: str, status: str, priority: str):
+
+    db = SessionLocal()
+
+    new_task = Task(
+        title=title,
+        description="",
+        priority=priority,
+        status=status
+    )
+
+    db.add(new_task)
+    db.commit()
+    db.refresh(new_task)
+
+    return {
+    "message": "Task Added Successfully",
+    "id": new_task.id,
+    "title": new_task.title,
+    "status": new_task.status,
+    "priority": new_task.priority
+  }
+@app.delete("/tasks/{task_id}")
+def delete_task(task_id: int):
+
+    db = SessionLocal()
+
+    task = db.query(Task).filter(Task.id == task_id).first()
+
+    if task is None:
+        return {
+            "message": "Task Not Found"
+        }
+
+    db.delete(task)
+    db.commit()
+
+    return {
+        "message": "Task Deleted Successfully"
+    }
